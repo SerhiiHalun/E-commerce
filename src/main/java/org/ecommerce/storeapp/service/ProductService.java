@@ -1,6 +1,7 @@
 package org.ecommerce.storeapp.service;
 
 import org.ecommerce.storeapp.model.Categories;
+import org.ecommerce.storeapp.model.Image;
 import org.ecommerce.storeapp.model.Product;
 import org.ecommerce.storeapp.repository.CategoriesRepository;
 import org.ecommerce.storeapp.repository.ProductRepository;
@@ -8,7 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -17,16 +20,36 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final CategoriesRepository categoriesRepository;
+    private final ImageService imageService;
     @Autowired
     public ProductService(ProductRepository productRepository,
-                          CategoriesRepository categoriesRepository) {
+                          CategoriesRepository categoriesRepository, ImageService imageService) {
         this.productRepository = productRepository;
         this.categoriesRepository = categoriesRepository;
+        this.imageService = imageService;
     }
     @Transactional
-    public Product createProduct(Product product) {
-        return productRepository.save(product);
+    public Product createProductWithImages(Product product, List<MultipartFile> files, int mainIndex) {
+
+        product.setImages(new ArrayList<>());
+        Product savedProduct = productRepository.save(product);
+
+
+        for (int i = 0; i < files.size(); i++) {
+            MultipartFile file = files.get(i);
+            if (!file.isEmpty()) {
+                boolean isMain = (i == mainIndex);
+
+                Image image = imageService.addImageToProduct(file, savedProduct, isMain);
+
+                savedProduct.getImages().add(image);
+            }
+        }
+
+        return savedProduct;
     }
+
+
     @Transactional(readOnly = true)
     @Cacheable("product")
     public Product GetProductById(int id){

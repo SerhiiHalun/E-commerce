@@ -3,6 +3,9 @@ package org.ecommerce.storeapp.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 @Data
 @Entity
 @NoArgsConstructor
@@ -10,14 +13,12 @@ import lombok.*;
 @Table(name = "product")
 public class Product {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     @Column(name = "name",nullable = false)
     private String name;
-    @Column(name = "description")
+    @Column(name = "description", nullable = false)
     private String description;
-    @ManyToOne
-    @JoinColumn(name = "category_id", nullable = false)
-    private Categories category;
     @Column(name = "price", nullable = false)
     private double price;
     @Column(name = "avail_amount",nullable = false)
@@ -25,69 +26,11 @@ public class Product {
     @Column(name = "discount")
     private long discount;
     @Column(name = "created_date")
-    private long createdDate;
+    private LocalDateTime createdDate;
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    private List<Image> images;
+    @ManyToOne
+    @JoinColumn(name = "category_id", nullable = false)
+    private Categories category;
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Categories getCategory() {
-        return category;
-    }
-
-    public void setCategory(Categories category) {
-        this.category = category;
-    }
-
-    public double getPrice() {
-        return price;
-    }
-
-    public void setPrice(double price) {
-        this.price = price;
-    }
-
-    public long getAvailAmount() {
-        return availAmount;
-    }
-
-    public void setAvailAmount(long availAmount) {
-        this.availAmount = availAmount;
-    }
-
-    public long getDiscount() {
-        return discount;
-    }
-
-    public void setDiscount(long discount) {
-        this.discount = discount;
-    }
-
-    public long getCreatedDate() {
-        return createdDate;
-    }
-
-    public void setCreatedDate(long createdDate) {
-        this.createdDate = createdDate;
-    }
 }
