@@ -1,6 +1,7 @@
 package org.ecommerce.storeapp.service;
 
 import jakarta.persistence.EntityNotFoundException;
+import org.ecommerce.storeapp.model.Product;
 import org.ecommerce.storeapp.model.User;
 import org.ecommerce.storeapp.model.Wishlist;
 import org.ecommerce.storeapp.repository.WishlistRepository;
