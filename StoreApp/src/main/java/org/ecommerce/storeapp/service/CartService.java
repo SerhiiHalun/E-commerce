@@ -1,6 +1,7 @@
 package org.ecommerce.storeapp.service;
 
 import org.ecommerce.storeapp.model.Cart;
+import org.ecommerce.storeapp.model.Product;
 import org.ecommerce.storeapp.model.User;
 import org.ecommerce.storeapp.repository.CartRepository;
 import org.springframework.stereotype.Service;
@@ -31,8 +32,7 @@ public class CartService {
         return cartRepository.save(cart);
     }
 
-    public Cart updateCart(int id,
-            , User user, Product product, Long amount) {
+    public Cart updateCart(int id, User user, Product product, Long amount) {
 
         return cartRepository.findById(id).map(cart -> {
             if (user != null) {
