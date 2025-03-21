@@ -39,5 +39,5 @@ public class Address {
     private String phoneNumber;
 
     @Column(name = "is_default", nullable = false)
-    private boolean isDefault;
+    private boolean defaultAddress;
 }
