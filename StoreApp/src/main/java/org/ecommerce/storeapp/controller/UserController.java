@@ -2,6 +2,8 @@ package org.ecommerce.storeapp.controller;
 
 import org.ecommerce.storeapp.model.User;
 import org.ecommerce.storeapp.service.UserService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,47 +19,67 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public User registerUser(
+    public ResponseEntity<?> registerUser(
             @RequestParam String firstName,
             @RequestParam String lastName,
             @RequestParam String email,
             @RequestParam String password) {
-        return userService.registerUser(firstName, lastName, email, password);
+        User user = userService.registerUser(firstName, lastName, email, password);
+        return user != null
+                ? ResponseEntity.status(HttpStatus.CREATED).body(user)
+                : ResponseEntity.badRequest().body("Registration failed");
     }
 
     @PostMapping("/login")
-    public String loginUser(@RequestParam String email, @RequestParam String password) {
-        return userService.loginUser(email, password);
+    public ResponseEntity<String> loginUser(@RequestParam String email, @RequestParam String password) {
+        String token = userService.loginUser(email, password);
+        return token != null
+                ? ResponseEntity.ok(token)
+                : ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
     }
 
     @GetMapping("/get")
-    public User getUser() {
-        return userService.getCurrentUser();
+    public ResponseEntity<?> getUser() {
+        User user = userService.getCurrentUser();
+        return user != null
+                ? ResponseEntity.ok(user)
+                : ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
     }
 
     @GetMapping("/get-all-users")
-    public List<User> getAllUsers() {
-        return userService.getAllUsers();
+    public ResponseEntity<List<User>> getAllUsers() {
+        List<User> users = userService.getAllUsers();
+        return users.isEmpty()
+                ? ResponseEntity.noContent().build()
+                : ResponseEntity.ok(users);
     }
+
 
     @GetMapping("/get-by-id/{id}")
-    public User getUserById(@PathVariable int id) {
-        return userService.getUserById(id);
+    public ResponseEntity<?> getUserById(@PathVariable int id) {
+        User user = userService.getUserById(id);
+        return user != null
+                ? ResponseEntity.ok(user)
+                : ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
     }
 
-    @PostMapping("/update")
-    public User updateUser(
+    @PutMapping("/update")
+    public ResponseEntity<?> updateUser(
             @RequestParam(required = false) String firstName,
             @RequestParam(required = false) String lastName,
             @RequestParam(required = false) String email,
             @RequestParam(required = false) String password,
-            @RequestParam(required = false) String role
-    ) {
-        return userService.updateUser(firstName, lastName, email, password, role);
+            @RequestParam(required = false) String role) {
+        User updatedUser = userService.updateUser(firstName, lastName, email, password, role);
+        return updatedUser != null
+                ? ResponseEntity.ok(updatedUser)
+                : ResponseEntity.badRequest().body("Update failed");
     }
 
     @DeleteMapping("/delete/{id}")
-    public void deleteUser(@PathVariable int id) {
+    public ResponseEntity<?> deleteUser(@PathVariable int id) {
         userService.deleteUser(id);
+        return ResponseEntity.noContent().build();
+
     }
 }

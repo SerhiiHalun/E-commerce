@@ -45,7 +45,7 @@ public class UserService {
         user.setFirstName(firstName);
         user.setLastName(lastName);
         user.setEmail(email);
-        user.setPassword(passwordEncoder.encode(password)); //TODO password encoding
+        user.setPassword(passwordEncoder.encode(password));
         user.setRole(Role.USER);
         return userRepository.save(user);
     }
