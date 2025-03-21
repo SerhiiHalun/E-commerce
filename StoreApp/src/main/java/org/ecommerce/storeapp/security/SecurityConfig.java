@@ -9,7 +9,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -46,8 +45,11 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/user/register", "/api/user/login").permitAll()
-                        .requestMatchers("/api/user/get-all-users", "/api/user/delete/**", "api/user/get-by-id/").hasRole("ADMIN")
-                        .requestMatchers("/api/user/update", "api/user/get").authenticated()
+                        .requestMatchers("/api/user/get-all-users", "/api/user/delete/**", "/api/user/get-by-id/").hasRole("ADMIN")
+                        .requestMatchers("/api/user/update", "/api/user/get").authenticated()
+                        .requestMatchers("/api/address/create", "/api/address/update","/api/address/get-all-for-current-user",
+                                "/api/address/delete/**","/api/address/get-by-id/").authenticated()
+                        .requestMatchers("/api/address/get-all").hasRole("ADMIN")
                         .anyRequest().permitAll()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
