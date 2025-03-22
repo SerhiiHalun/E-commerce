@@ -25,31 +25,31 @@ public class PaymentService {
                 .orElseThrow(() -> new EntityNotFoundException("Payment not found"));
     }
 
-    public Payment createPayment(Order order, String paymentMethod, String status) {
-        Payment payment = new Payment();
-        payment.setOrder(order);
-        payment.setPaymentMethod(paymentMethod);
-        payment.setStatus(status);
-        payment.setPaymentDate(LocalDate.now());
-
-        return paymentRepository.save(payment);
-    }
-
-    public Payment updatePayment(int id, Order order, String paymentMethod, String status) {
-        return paymentRepository.findById(id).map(payment -> {
-            if (order != null) {
-                payment.setOrder(order);
-            }
-            if (paymentMethod != null) {
-                payment.setPaymentMethod(paymentMethod);
-            }
-            if (status != null) {
-                payment.setStatus(status);
-            }
-
-            return paymentRepository.save(payment);
-        }).orElseThrow(() -> new RuntimeException("Payment not found"));
-    }
+//    public Payment createPayment(Order order, String paymentMethod, String status) {
+//        Payment payment = new Payment();
+//        payment.setOrder(order);
+//        payment.setPaymentMethod(paymentMethod);
+//        payment.setStatus(status);
+//        payment.setPaymentDate(LocalDate.now());
+//
+//        return paymentRepository.save(payment);
+//    }
+//
+//    public Payment updatePayment(int id, Order order, String paymentMethod, String status) {
+//        return paymentRepository.findById(id).map(payment -> {
+//            if (order != null) {
+//                payment.setOrder(order);
+//            }
+//            if (paymentMethod != null) {
+//                payment.setPaymentMethod(paymentMethod);
+//            }
+//            if (status != null) {
+//                payment.setStatus(status);
+//            }
+//
+//            return paymentRepository.save(payment);
+//        }).orElseThrow(() -> new RuntimeException("Payment not found"));
+//    }
 
     public void deletePayment(int id) {
         paymentRepository.deleteById(id);
