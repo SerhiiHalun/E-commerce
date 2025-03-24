@@ -25,7 +25,6 @@ public class SecurityConfig {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
         this.userDetailsService = userDetailsService;
     }
-
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -50,6 +49,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/address/create", "/api/address/update","/api/address/get-all-for-current-user",
                                 "/api/address/delete/**","/api/address/get-by-id/").authenticated()
                         .requestMatchers("/api/address/get-all").hasRole("ADMIN")
+                        .requestMatchers("/api/category/get-all","/api/category/get-by-id/").permitAll()
+                        .requestMatchers("/api/category/create","/api/category/delete/**","/api/category/update").permitAll()
                         .anyRequest().permitAll()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
