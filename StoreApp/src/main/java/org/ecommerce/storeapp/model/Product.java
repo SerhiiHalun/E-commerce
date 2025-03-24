@@ -31,6 +31,6 @@ public class Product {
     private List<Image> images;
     @ManyToOne
     @JoinColumn(name = "category_id", nullable = false)
-    private Categories category;
+    private Category category;
 
 }
