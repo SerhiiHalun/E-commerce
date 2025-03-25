@@ -1,5 +1,7 @@
 package org.ecommerce.storeapp.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -27,7 +29,9 @@ public class Product {
     private long discount;
     @Column(name = "created_date")
     private LocalDateTime createdDate;
+
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    @JsonManagedReference
     private List<Image> images;
     @ManyToOne
     @JoinColumn(name = "category_id", nullable = false)
