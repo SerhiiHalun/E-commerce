@@ -25,6 +25,7 @@ public class SecurityConfig {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
         this.userDetailsService = userDetailsService;
     }
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -46,11 +47,13 @@ public class SecurityConfig {
                         .requestMatchers("/api/user/register", "/api/user/login").permitAll()
                         .requestMatchers("/api/user/get-all-users", "/api/user/delete/**", "/api/user/get-by-id/").hasRole("ADMIN")
                         .requestMatchers("/api/user/update", "/api/user/get").authenticated()
-                        .requestMatchers("/api/address/create", "/api/address/update","/api/address/get-all-for-current-user",
-                                "/api/address/delete/**","/api/address/get-by-id/").authenticated()
+                        .requestMatchers("/api/address/create", "/api/address/update", "/api/address/get-all-for-current-user",
+                                "/api/address/delete/**", "/api/address/get-by-id/").authenticated()
                         .requestMatchers("/api/address/get-all").hasRole("ADMIN")
-                        .requestMatchers("/api/category/get-all","/api/category/get-by-id/").permitAll()
-                        .requestMatchers("/api/category/create","/api/category/delete/**","/api/category/update").permitAll()
+                        .requestMatchers("/api/category/get-all", "/api/category/get-by-id/").permitAll()
+                        .requestMatchers("/api/category/create", "/api/category/delete/**", "/api/category/update").hasRole("ADMIN")
+                        .requestMatchers("/api/product/create", "/api/product/delete/**", "/api/product/update/").hasAnyRole("SELLER", "ADMIN")
+                        .requestMatchers("/api/product/get-all", "/api/product/get-by-id/", "/api/product/get-by-category-id/").permitAll()
                         .anyRequest().permitAll()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
