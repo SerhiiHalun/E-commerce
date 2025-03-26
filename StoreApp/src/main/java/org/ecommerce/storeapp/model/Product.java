@@ -2,6 +2,7 @@ package org.ecommerce.storeapp.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -25,7 +26,8 @@ public class Product {
     private long availAmount;
     @Column(name = "discount")
     private long discount;
-    @Column(name = "created_date")
+    @Column(name = "created_date", updatable = false)
+    @CreationTimestamp
     private LocalDateTime createdDate;
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     private List<Image> images;

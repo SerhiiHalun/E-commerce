@@ -68,21 +68,55 @@ public class ProductService {
         return productRepository.findAllByCategoryId(category.getId());
 
     }
-    @Transactional
-    public Product updateProduct(int id, Product updatedProduct) {
-        return productRepository.findById(id)
-                .map(product -> {
-                    product.setName(updatedProduct.getName());
-                    product.setDescription(updatedProduct.getDescription());
-                    product.setPrice(updatedProduct.getPrice());
-                    product.setAvailAmount(updatedProduct.getAvailAmount());
-                    product.setDiscount(updatedProduct.getDiscount());
-                    product.setCreatedDate(updatedProduct.getCreatedDate());
-                    product.setCategory(updatedProduct.getCategory());
-                    return productRepository.save(product);
-                })
-                .orElseThrow(() -> new NoSuchElementException("Product with id " + id + " not found"));
+    @Transactional(readOnly = true)
+    public List<Product> searchProductsByName(String name) {
+        if (name == null || name.trim().isEmpty()) {
+            return productRepository.findAll();
+        }
+        return productRepository.findByNameContainingIgnoreCase(name.trim());
     }
+    @Transactional
+    public Product updateProductWithImages(int id,
+                                           Product updatedProduct,
+                                           List<MultipartFile> newFiles,
+                                           int mainIndex,
+                                           List<Long> deleteImageIds) {
+
+
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Product with id " + id + " not found"));
+
+
+        product.setName(updatedProduct.getName());
+        product.setDescription(updatedProduct.getDescription());
+        product.setPrice(updatedProduct.getPrice());
+        product.setAvailAmount(updatedProduct.getAvailAmount());
+        product.setDiscount(updatedProduct.getDiscount());
+        product.setCreatedDate(updatedProduct.getCreatedDate());
+        product.setCategory(updatedProduct.getCategory());
+
+        productRepository.save(product);
+
+
+        if (deleteImageIds != null) {
+            for (Long imageId : deleteImageIds) {
+                imageService.deleteImage(imageId);
+            }
+        }
+
+        if (newFiles != null && !newFiles.isEmpty()) {
+            for (int i = 0; i < newFiles.size(); i++) {
+                MultipartFile file = newFiles.get(i);
+                if (!file.isEmpty()) {
+                    boolean isMain = (i == mainIndex);
+                    Image image = imageService.addImageToProduct(file, product, isMain);
+                }
+            }
+        }
+
+        return product;
+    }
+
 
 
     @Transactional
