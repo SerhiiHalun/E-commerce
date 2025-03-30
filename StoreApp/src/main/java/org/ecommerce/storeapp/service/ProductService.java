@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -60,14 +61,23 @@ public class ProductService {
     public List<Product> getAllProducts() {
         return productRepository.findAll();
     }
+    public List<Product> getProductsByDiscount(boolean withDiscount, Integer limit) {
+        List<Product> products = withDiscount
+                ? productRepository.findByDiscountGreaterThan(0)
+                : productRepository.findByDiscount(0);
+
+        Collections.shuffle(products);
+        if (limit != null) {
+            return products.stream().limit(limit).toList();
+        }
+        return products;
+    }
     @Transactional(readOnly = true)
     public List<Product> getProductsByCategoryId(int categoryId) {
-        Categories category = categoriesRepository.findById(categoryId)
-                .orElseThrow(() -> new RuntimeException("Category with ID=" + categoryId + " not found"));
-
-        return productRepository.findAllByCategoryId(category.getId());
-
+        return productRepository.findByCategoryId(categoryId);
     }
+
+
     @Transactional(readOnly = true)
     public List<Product> searchProductsByName(String name) {
         if (name == null || name.trim().isEmpty()) {

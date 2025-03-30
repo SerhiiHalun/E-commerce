@@ -18,7 +18,8 @@ public class Product {
     private int id;
     @Column(name = "name",nullable = false)
     private String name;
-    @Column(name = "description", nullable = false)
+    @Lob
+    @Column(name = "description", nullable = false, columnDefinition = "Text")
     private String description;
     @Column(name = "price", nullable = false)
     private double price;
@@ -34,5 +35,10 @@ public class Product {
     @ManyToOne
     @JoinColumn(name = "category_id", nullable = false)
     private Categories category;
-
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    private List<Feedback> feedbackList;
+    @Transient
+    public double getFinalPrice() {
+        return Math.round(price * (1 - discount / 100.0) * 100.0) / 100.0;
+    }
 }

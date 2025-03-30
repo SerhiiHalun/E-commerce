@@ -23,6 +23,14 @@ public class ProductController {
         this.productService = productService;
         this.categoriesService = categoriesService;
     }
+    @GetMapping("/home")
+    public String showHome(Model model) {
+        model.addAttribute("specialProducts", productService.getProductsByDiscount(true, null));
+        model.addAttribute("randomProducts", productService.getProductsByDiscount(false, 10));
+        model.addAttribute("allCategories", categoriesService.findAll());
+        return "product/home";
+    }
+
 
     @GetMapping
     public String listProducts(Model model) {
@@ -64,6 +72,7 @@ public class ProductController {
     public String getProduct(@PathVariable int id, Model model) {
         Product product = productService.GetProductById(id);
         model.addAttribute("product", product);
+        model.addAttribute("specialProducts", productService.getProductsByDiscount(true, null));
         return "product/view-product";
     }
 
