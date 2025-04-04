@@ -1,4 +1,4 @@
-package org.ecommerce.storeapp.controller;
+package org.ecommerce.storeapp.controller.api;
 
 import org.ecommerce.storeapp.model.Category;
 import org.ecommerce.storeapp.service.CategoryService;
@@ -10,16 +10,16 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/category")
-public class CategoryController {
+public class CategoryApiController {
     private final CategoryService categoryService;
 
-    public CategoryController(CategoryService categoryService) {
+    public CategoryApiController(CategoryService categoryService) {
         this.categoryService = categoryService;
     }
 
     @GetMapping("/get-all")
     public ResponseEntity<List<Category>> getAll() {
-        List<Category> categories = categoryService.getAllCategories();
+        List<Category> categories = categoryService.getAllCategory();
         return categories.isEmpty()
                 ? ResponseEntity.noContent().build()
                 : ResponseEntity.ok(categories);

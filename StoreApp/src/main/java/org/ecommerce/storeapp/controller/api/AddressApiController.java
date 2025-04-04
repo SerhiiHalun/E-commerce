@@ -1,4 +1,4 @@
-package org.ecommerce.storeapp.controller;
+package org.ecommerce.storeapp.controller.api;
 
 import org.ecommerce.storeapp.dto.CreateAddressRequestDTO;
 import org.ecommerce.storeapp.model.Address;
@@ -11,10 +11,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/address")
-public class AddressController {
+public class AddressApiController {
     private final AddressService addressService;
 
-    public AddressController(AddressService addressService) {
+    public AddressApiController(AddressService addressService) {
         this.addressService = addressService;
     }
 

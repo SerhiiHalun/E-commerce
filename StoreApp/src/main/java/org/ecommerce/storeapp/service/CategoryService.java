@@ -3,19 +3,42 @@ package org.ecommerce.storeapp.service;
 import jakarta.persistence.EntityNotFoundException;
 import org.ecommerce.storeapp.model.Category;
 import org.ecommerce.storeapp.repository.CategoryRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 public class CategoryService {
+
     private final CategoryRepository categoryRepository;
 
+    @Autowired
     public CategoryService(CategoryRepository categoryRepository) {
         this.categoryRepository = categoryRepository;
     }
 
-    public List<Category> getAllCategories() {
+    public List<Category> findAll() {
+        return categoryRepository.findAll();
+    }
+
+    public Category findById(int id) {
+        return categoryRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Category with id " + id + " not found"));
+    }
+
+    public Category save(Category category) {
+        return categoryRepository.save(category);
+    }
+
+    public void deleteById(int id) {
+        if (!categoryRepository.existsById(id)) {
+            throw new NoSuchElementException("Category with id " + id + " not found");
+        }
+        categoryRepository.deleteById(id);
+    }
+    public List<Category> getAllCategory() {
         return categoryRepository.findAll();
     }
 
@@ -39,4 +62,5 @@ public class CategoryService {
     public void deleteCategory(int id) {
         categoryRepository.deleteById(id);
     }
+
 }
