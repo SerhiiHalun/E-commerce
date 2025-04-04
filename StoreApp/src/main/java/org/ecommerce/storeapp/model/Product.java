@@ -1,5 +1,7 @@
 package org.ecommerce.storeapp.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -30,7 +32,9 @@ public class Product {
     @Column(name = "created_date", updatable = false)
     @CreationTimestamp
     private LocalDateTime createdDate;
+
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    @JsonManagedReference
     private List<Image> images;
     @ManyToOne
     @JoinColumn(name = "category_id", nullable = false)
@@ -41,4 +45,5 @@ public class Product {
     public double getFinalPrice() {
         return Math.round(price * (1 - discount / 100.0) * 100.0) / 100.0;
     }
+
 }

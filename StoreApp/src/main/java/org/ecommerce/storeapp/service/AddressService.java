@@ -2,7 +2,9 @@ package org.ecommerce.storeapp.service;
 
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import org.ecommerce.storeapp.model.Address;
+import org.ecommerce.storeapp.model.Role;
 import org.ecommerce.storeapp.model.User;
 import org.ecommerce.storeapp.repository.AddressRepository;
 import org.springframework.stereotype.Service;
@@ -13,22 +15,42 @@ import java.util.List;
 public class AddressService {
 
     private final AddressRepository addressRepository;
+    private final UserService userService;
 
-    public AddressService(AddressRepository addressRepository) {
+    public AddressService(AddressRepository addressRepository, UserService userService) {
         this.addressRepository = addressRepository;
+        this.userService = userService;
     }
 
     public List<Address> getAllAddresses() {
         return addressRepository.findAll();
     }
 
-    public Address getAddressById(int id) {
-        return addressRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Address not found"));
+    public List<Address> getAllAddressesForCurrentUser() {
+        return addressRepository.findAllByUser(userService.getCurrentUser());
     }
 
-    public Address createAddress(User user, String country, String city, String state,
+    public Address getAddressById(int id) {
+        User user = userService.getCurrentUser();
+        Address address = addressRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Address not found"));
+
+        if (user.getRole() == Role.ADMIN || user == address.getUser()) {
+            return address;
+        }
+        return null;
+
+    }
+
+    @Transactional
+    public Address createAddress(String country, String city, String state,
                                  String street, String phoneNumber, String postCode, boolean isDefault) {
+        User user = userService.getCurrentUser();
+        if (user == null) {
+            throw new IllegalStateException("Current user not found");
+        }
+
+
         Address address = new Address();
         address.setUser(user);
         address.setCountry(country);
@@ -37,15 +59,31 @@ public class AddressService {
         address.setStreet(street);
         address.setPhoneNumber(phoneNumber);
         address.setPostCode(postCode);
-        address.setDefault(isDefault);
+
+        if (isDefault) {
+            addressRepository.findByDefaultAddressIsTrue().ifPresent(defaultAddress -> {
+                defaultAddress.setDefaultAddress(false);
+                addressRepository.save(defaultAddress);
+                System.out.println("Default address updated");
+            });
+
+            address.setDefaultAddress(true);
+            System.out.println("Default address updated1");
+        } else {
+            address.setDefaultAddress(false);
+            System.out.println("Default address updated2");
+        }
+        System.out.println("Address created");
         return addressRepository.save(address);
     }
 
-    public Address updateAddress(int id, User user, String country, String city, String state,
-                                 String street, String phoneNumber, String postCode, boolean isDefault) {
+    @Transactional
+    public Address updateAddress(int id, String country, String city, String state,
+                                 String street, String phoneNumber, String postCode, Boolean isDefault) {
 
         return addressRepository.findById(id).map(address -> {
-            if (user != null) {
+            User user = userService.getCurrentUser();
+            if (user != null && !address.getUser().getId().equals(user.getId())) {
                 address.setUser(user);
             }
             if (country != null && !country.isBlank()) {
@@ -66,15 +104,32 @@ public class AddressService {
             if (postCode != null && !postCode.isBlank()) {
                 address.setPostCode(postCode);
             }
-            address.setDefault(isDefault);
+            if (isDefault) {
+                addressRepository.findByDefaultAddressIsTrue().ifPresent(defaultAddress -> {
+                    defaultAddress.setDefaultAddress(false);
+                    addressRepository.save(defaultAddress);
+                });
+            }
+            address.setDefaultAddress(isDefault);
 
 
             return addressRepository.save(address);
-        }).orElseThrow(() -> new RuntimeException("Address not found"));
+        }).orElseThrow(() -> new EntityNotFoundException("Address not found"));
     }
 
-
+    @Transactional
     public void deleteAddress(int id) {
+        Address address = addressRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Address not found"));
+
         addressRepository.deleteById(id);
+
+        // Change default status if deleted address was default
+        if (address.isDefaultAddress()) {
+            addressRepository.findTopByOrderByIdDesc().ifPresent(newDefault -> {
+                newDefault.setDefaultAddress(true);
+                addressRepository.save(newDefault);
+            });
+        }
     }
 }

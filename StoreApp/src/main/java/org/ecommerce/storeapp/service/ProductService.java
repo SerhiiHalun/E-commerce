@@ -1,9 +1,9 @@
 package org.ecommerce.storeapp.service;
 
-import org.ecommerce.storeapp.model.Categories;
+import org.ecommerce.storeapp.model.Category;
 import org.ecommerce.storeapp.model.Image;
 import org.ecommerce.storeapp.model.Product;
-import org.ecommerce.storeapp.repository.CategoriesRepository;
+import org.ecommerce.storeapp.repository.CategoryRepository;
 import org.ecommerce.storeapp.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
@@ -20,13 +20,13 @@ import java.util.NoSuchElementException;
 public class ProductService {
 
     private final ProductRepository productRepository;
-    private final CategoriesRepository categoriesRepository;
+    private final CategoryRepository categoryRepository;
     private final ImageService imageService;
     @Autowired
     public ProductService(ProductRepository productRepository,
-                          CategoriesRepository categoriesRepository, ImageService imageService) {
+                          CategoryRepository categoryRepository, ImageService imageService) {
         this.productRepository = productRepository;
-        this.categoriesRepository = categoriesRepository;
+        this.categoryRepository = categoryRepository;
         this.imageService = imageService;
     }
     @Transactional

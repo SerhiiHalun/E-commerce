@@ -1,6 +1,7 @@
 package org.ecommerce.storeapp.service;
 
 import jakarta.persistence.EntityNotFoundException;
+import org.ecommerce.storeapp.model.Order;
 import org.ecommerce.storeapp.model.Payment;
 import org.ecommerce.storeapp.repository.PaymentRepository;
 import org.springframework.stereotype.Service;
