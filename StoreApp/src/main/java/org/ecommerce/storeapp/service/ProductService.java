@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -60,29 +61,72 @@ public class ProductService {
     public List<Product> getAllProducts() {
         return productRepository.findAll();
     }
+    public List<Product> getProductsByDiscount(boolean withDiscount, Integer limit) {
+        List<Product> products = withDiscount
+                ? productRepository.findByDiscountGreaterThan(0)
+                : productRepository.findByDiscount(0);
+
+        Collections.shuffle(products);
+        if (limit != null) {
+            return products.stream().limit(limit).toList();
+        }
+        return products;
+    }
     @Transactional(readOnly = true)
     public List<Product> getProductsByCategoryId(int categoryId) {
-        Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new RuntimeException("Category with ID=" + categoryId + " not found"));
+        return productRepository.findByCategoryId(categoryId);
+    }
 
-        return productRepository.findAllByCategoryId(category.getId());
 
+    @Transactional(readOnly = true)
+    public List<Product> searchProductsByName(String name) {
+        if (name == null || name.trim().isEmpty()) {
+            return productRepository.findAll();
+        }
+        return productRepository.findByNameContainingIgnoreCase(name.trim());
     }
     @Transactional
-    public Product updateProduct(int id, Product updatedProduct) {
-        return productRepository.findById(id)
-                .map(product -> {
-                    product.setName(updatedProduct.getName());
-                    product.setDescription(updatedProduct.getDescription());
-                    product.setPrice(updatedProduct.getPrice());
-                    product.setAvailAmount(updatedProduct.getAvailAmount());
-                    product.setDiscount(updatedProduct.getDiscount());
-                    product.setCreatedDate(updatedProduct.getCreatedDate());
-                    product.setCategory(updatedProduct.getCategory());
-                    return productRepository.save(product);
-                })
+    public Product updateProductWithImages(int id,
+                                           Product updatedProduct,
+                                           List<MultipartFile> newFiles,
+                                           int mainIndex,
+                                           List<Long> deleteImageIds) {
+
+
+        Product product = productRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Product with id " + id + " not found"));
+
+
+        product.setName(updatedProduct.getName());
+        product.setDescription(updatedProduct.getDescription());
+        product.setPrice(updatedProduct.getPrice());
+        product.setAvailAmount(updatedProduct.getAvailAmount());
+        product.setDiscount(updatedProduct.getDiscount());
+        product.setCreatedDate(updatedProduct.getCreatedDate());
+        product.setCategory(updatedProduct.getCategory());
+
+        productRepository.save(product);
+
+
+        if (deleteImageIds != null) {
+            for (Long imageId : deleteImageIds) {
+                imageService.deleteImage(imageId);
+            }
+        }
+
+        if (newFiles != null && !newFiles.isEmpty()) {
+            for (int i = 0; i < newFiles.size(); i++) {
+                MultipartFile file = newFiles.get(i);
+                if (!file.isEmpty()) {
+                    boolean isMain = (i == mainIndex);
+                    Image image = imageService.addImageToProduct(file, product, isMain);
+                }
+            }
+        }
+
+        return product;
     }
+
 
 
     @Transactional

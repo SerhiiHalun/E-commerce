@@ -1,65 +1,129 @@
 package org.ecommerce.storeapp.controller;
 
+import org.ecommerce.storeapp.model.Categories;
 import org.ecommerce.storeapp.model.Product;
+import org.ecommerce.storeapp.service.CategoriesService;
 import org.ecommerce.storeapp.service.ProductService;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-@RestController
-@RequestMapping("/api/product")
+@Controller
+@RequestMapping("/product")
 public class ProductController {
+
     private final ProductService productService;
+    private final CategoriesService categoriesService;
 
-
-    public ProductController(ProductService productService) {
+    public ProductController(ProductService productService,
+                             CategoriesService categoriesService) {
         this.productService = productService;
+        this.categoriesService = categoriesService;
+    }
+    @GetMapping("/home")
+    public String showHome(Model model) {
+        model.addAttribute("specialProducts", productService.getProductsByDiscount(true, null));
+        model.addAttribute("randomProducts", productService.getProductsByDiscount(false, 10));
+        model.addAttribute("allCategories", categoriesService.findAll());
+        return "product/home";
     }
 
-    @GetMapping("/get-all")
-    public ResponseEntity<List<Product>> getAll() {
-        List<Product> productList = productService.getAllProducts();
 
-        return productList.isEmpty()
-                ? ResponseEntity.noContent().build()
-                : ResponseEntity.ok(productList);
+    @GetMapping
+    public String listProducts(Model model) {
+        List<Product> products = productService.getAllProducts();
+        model.addAttribute("products", products);
+        return "product/list";
+    }
+    @GetMapping("/search")
+    public String searchProducts(
+            @RequestParam(name = "query", required = false) String query,
+            @RequestParam(name = "categoryId", required = false) Integer categoryId,
+            Model model
+    ) {
+        List<Categories> allCategories = categoriesService.findAll();
+        model.addAttribute("allCategories", allCategories);
+
+        if (categoryId != null) {
+            List<Product> products = productService.getProductsByCategoryId(categoryId);
+            model.addAttribute("products", products);
+            model.addAttribute("selectedCategoryId", categoryId);
+            model.addAttribute("searchQuery", null);
+        }
+        else if (query != null && !query.trim().isEmpty()) {
+            List<Product> products = productService.searchProductsByName(query.trim());
+            model.addAttribute("products", products);
+            model.addAttribute("searchQuery", query.trim());
+            model.addAttribute("selectedCategoryId", null);
+        }
+        else {
+            List<Product> products = productService.getAllProducts();
+            model.addAttribute("products", products);
+            model.addAttribute("searchQuery", "");
+            model.addAttribute("selectedCategoryId", null);
+        }
+        return "product/search";
     }
 
-    @GetMapping("/get-by-category-id/{categoryId}")
-    public ResponseEntity<List<Product>> getByCategoryId(@PathVariable int categoryId) {
-        List<Product> productList = productService.getProductsByCategoryId(categoryId);
-
-        return productList.isEmpty()
-                ? ResponseEntity.noContent().build()
-                : ResponseEntity.ok(productList);
+    @GetMapping("/{id}")
+    public String getProduct(@PathVariable int id, Model model) {
+        Product product = productService.GetProductById(id);
+        model.addAttribute("product", product);
+        model.addAttribute("specialProducts", productService.getProductsByDiscount(true, null));
+        return "product/view-product";
     }
 
-    @GetMapping("/get-by-id/{id}")
-    public ResponseEntity<Product> getById(@PathVariable int id) {
-        return ResponseEntity.ok(productService.GetProductById(id));
+    @GetMapping("/create")
+    public String showCreateForm(Model model) {
+        model.addAttribute("product", new Product());
+
+        List<Categories> categories = categoriesService.findAll();
+        model.addAttribute("categories", categories);
+
+        return "product/create";
     }
 
-    @PostMapping(value = "/create",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Product> create(@RequestPart("product") Product product,
-                                          @RequestPart("images") List<MultipartFile> images,
-                                          @RequestParam("mainImageIndex") Integer  mainImageIndex) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(productService.createProductWithImages(product, images, mainImageIndex));
+    @PostMapping
+    public String createProduct(@ModelAttribute("product") Product product,
+                                @RequestParam(name = "files", required = false) List<MultipartFile> files,
+                                @RequestParam(name = "mainIndex", defaultValue = "0") int mainIndex) {
+
+        productService.createProductWithImages(product,
+                (files != null ? files : List.of()), mainIndex);
+
+        return "redirect:/product";
     }
 
-    @PutMapping("/update/{id}")
-    public ResponseEntity<Product> update(@PathVariable int id, @RequestBody Product product) {
-        return ResponseEntity.ok(productService.updateProduct(id, product));
+
+    @GetMapping("/{id}/edit")
+    public String showEditForm(@PathVariable int id, Model model) {
+        Product product = productService.GetProductById(id);
+        model.addAttribute("product", product);
+
+        List<Categories> categories = categoriesService.findAll();
+        model.addAttribute("categories", categories);
+
+        return "product/edit";
     }
 
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> delete(@PathVariable int id) {
+    @PostMapping("/{id}/update")
+    public String updateProduct(@PathVariable int id,
+                                @ModelAttribute("product") Product updatedProduct,
+                                @RequestParam(name = "files", required = false) List<MultipartFile> files,
+                                @RequestParam(name = "mainIndex", defaultValue = "-1") int mainIndex,
+                                @RequestParam(name = "deleteImageIds", required = false) List<Long> deleteImageIds) {
+
+        productService.updateProductWithImages(id, updatedProduct, files, mainIndex, deleteImageIds);
+        return "redirect:/product/{id}";
+    }
+
+
+    @GetMapping("/{id}/delete")
+    public String deleteProduct(@PathVariable int id) {
         productService.deleteProduct(id);
-        return ResponseEntity.ok("Product deleted successfully");
+        return "redirect:/product";
     }
 
-}
