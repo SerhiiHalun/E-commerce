@@ -20,8 +20,7 @@ public class Product {
     private int id;
     @Column(name = "name",nullable = false)
     private String name;
-    @Lob
-    @Column(name = "description", nullable = false, columnDefinition = "Text")
+    @Column(name = "description", nullable = false, columnDefinition = "text")
     private String description;
     @Column(name = "price", nullable = false)
     private double price;

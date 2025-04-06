@@ -16,28 +16,26 @@ import java.util.List;
 public class ProductController {
 
     private final ProductService productService;
-    private final CategoryService categoriesService;
+    private final CategoryService categoryService;
 
     public ProductController(ProductService productService,
                              CategoryService categoriesService) {
         this.productService = productService;
-        this.categoriesService = categoriesService;
+        this.categoryService = categoriesService;
     }
 
     @GetMapping("/home")
     public String showHome(Model model) {
         model.addAttribute("specialProducts", productService.getProductsByDiscount(true, null));
         model.addAttribute("randomProducts", productService.getProductsByDiscount(false, 10));
-        model.addAttribute("allCategories", categoriesService.findAll());
+        model.addAttribute("allCategories", categoryService.findAll());
         return "product/home";
     }
 
 
     @GetMapping
     public String listProducts(Model model) {
-        List<Product> products = productService.getAllProducts();
-        model.addAttribute("products", products);
-        return "product/list";
+        return "redirect:/home";
     }
 
     @GetMapping("/search")
@@ -46,7 +44,7 @@ public class ProductController {
             @RequestParam(name = "categoryId", required = false) Integer categoryId,
             Model model
     ) {
-        List<Category> allCategories = categoriesService.findAll();
+        List<Category> allCategories = categoryService.findAll();
         model.addAttribute("allCategories", allCategories);
 
         if (categoryId != null) {
@@ -80,21 +78,22 @@ public class ProductController {
     public String showCreateForm(Model model) {
         model.addAttribute("product", new Product());
 
-        List<Category> categories = categoriesService.findAll();
+        List<Category> categories = categoryService.findAll();
         model.addAttribute("categories", categories);
 
         return "product/create";
     }
 
-    @PostMapping
+    @PostMapping("/create")
     public String createProduct(@ModelAttribute("product") Product product,
                                 @RequestParam(name = "files", required = false) List<MultipartFile> files,
                                 @RequestParam(name = "mainIndex", defaultValue = "0") int mainIndex) {
 
-        productService.createProductWithImages(product,
+        Product createdProduct = productService.createProductWithImages(product,
                 (files != null ? files : List.of()), mainIndex);
 
-        return "redirect:/product";
+
+        return "redirect:/product/"+ createdProduct.getId();
     }
 
 
@@ -103,7 +102,7 @@ public class ProductController {
         Product product = productService.GetProductById(id);
         model.addAttribute("product", product);
 
-        List<Category> categories = categoriesService.findAll();
+        List<Category> categories = categoryService.findAll();
         model.addAttribute("categories", categories);
 
         return "product/edit";
