@@ -1,4 +1,4 @@
-package org.ecommerce.storeapp.controller;
+package org.ecommerce.storeapp.controller.api;
 
 import org.ecommerce.storeapp.model.User;
 import org.ecommerce.storeapp.service.UserService;
@@ -10,22 +10,19 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/user")
-public class UserController {
+public class UserApiController {
     private final UserService userService;
 
 
-    public UserController(UserService userService) {
+    public UserApiController(UserService userService) {
         this.userService = userService;
     }
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(
-            @RequestParam String firstName,
-            @RequestParam String lastName,
-            @RequestParam String email,
-            @RequestParam String password) {
-        User user = userService.registerUser(firstName, lastName, email, password);
-        return user != null
+            @RequestBody User user) {
+        User returnUser = userService.registerUser(user);
+        return returnUser != null
                 ? ResponseEntity.status(HttpStatus.CREATED).body(user)
                 : ResponseEntity.badRequest().body("Registration failed");
     }

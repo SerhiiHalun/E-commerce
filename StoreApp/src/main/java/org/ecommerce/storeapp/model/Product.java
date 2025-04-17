@@ -20,8 +20,7 @@ public class Product {
     private int id;
     @Column(name = "name",nullable = false)
     private String name;
-    @Lob
-    @Column(name = "description", nullable = false, columnDefinition = "Text")
+    @Column(name = "description", nullable = false, columnDefinition = "text")
     private String description;
     @Column(name = "price", nullable = false)
     private double price;
@@ -38,7 +37,7 @@ public class Product {
     private List<Image> images;
     @ManyToOne
     @JoinColumn(name = "category_id", nullable = false)
-    private Categories category;
+    private Category category;
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     private List<Feedback> feedbackList;
     @Transient

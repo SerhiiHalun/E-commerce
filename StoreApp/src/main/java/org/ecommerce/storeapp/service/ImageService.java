@@ -76,7 +76,6 @@ public class ImageService {
         return imageRepository.findAll();
     }
 
-
     @Transactional
     public Image updateImage(Long imageId, MultipartFile newFile, Boolean newIsMain) {
         Image image = getImageById(imageId);

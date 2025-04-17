@@ -54,9 +54,10 @@
             <a href="/cart">
                 <img src="/image/cart.svg" alt="Cart" width="24" height="24">
             </a>
-            <a href="/account">
+            <a href="/auth/account">
                 <img src="/image/user.svg" alt="User" width="24" height="24">
             </a>
+
         </div>
     </div>
 </nav>
@@ -131,6 +132,29 @@
 </div>
 <section class="py-5 bg-white">
     <div class="container px-2 position-relative">
+        <div class="row mt-5">
+            <div class="col-md-8 mx-auto">
+                <h4 class="mb-4">Customer Reviews</h4>
+
+                <div th:if="${product.feedbackList != null and !#lists.isEmpty(product.feedbackList)}">
+                    <div th:each="feedback : ${product.feedbackList}" class="card mb-3">
+                        <div class="card-body">
+                            <h6 class="card-subtitle text-muted" th:text="${feedback.user.username}">User Name</h6>
+                            <div class="text-warning">
+                <span th:each="star : ${#numbers.sequence(1,5)}"
+                      th:text="${star <= feedback.rating ? '★' : '☆'}"></span>
+                            </div>
+                            <p class="card-text" th:text="${feedback.comment}">User comment goes here...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div th:unless="${product.feedbackList != null and !#lists.isEmpty(product.feedbackList)}">
+                    <p>No reviews yet.</p>
+                </div>
+
+            </div>
+        </div>
         <div class="mb-4">
             <div class="d-flex align-items-center mb-1">
                 <div style="width: 20px; height: 40px; background-color: #B5C431; border-radius: 2px; margin-right: 10px;"></div>
@@ -169,29 +193,7 @@
                 </a>
             </div>
         </div>
-        <div class="row mt-5">
-            <div class="col-md-8 mx-auto">
-                <h4 class="mb-4">Customer Reviews</h4>
 
-                <div th:if="${product.feedbackList != null and !#lists.isEmpty(product.feedbackList)}">
-                    <div th:each="feedback : ${product.feedbackList}" class="card mb-3">
-                        <div class="card-body">
-                            <h6 class="card-subtitle text-muted" th:text="${feedback.user.username}">User Name</h6>
-                            <div class="text-warning">
-                <span th:each="star : ${#numbers.sequence(1,5)}"
-                      th:text="${star <= feedback.rating ? '★' : '☆'}"></span>
-                            </div>
-                            <p class="card-text" th:text="${feedback.comment}">User comment goes here...</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div th:unless="${product.feedbackList != null and !#lists.isEmpty(product.feedbackList)}">
-                    <p>No reviews yet.</p>
-                </div>
-
-            </div>
-        </div>
 
     </div>
 </section>

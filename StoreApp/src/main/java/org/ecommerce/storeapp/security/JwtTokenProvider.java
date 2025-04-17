@@ -23,14 +23,18 @@ public class JwtTokenProvider {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 
-    @Value("${app.jwt.expiration}")
+
     private long jwtExpirationTime;
-    @Value("${app.jwt.secret}")
+
     private String secret;
 
-//    private final Key signingKey= Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
+    private final Key signingKey;
 
-
+    public JwtTokenProvider(@Value("${app.jwt.expiration}") long jwtExpirationTime,
+    @Value("${app.jwt.secret}")String secret) {
+        this.jwtExpirationTime = jwtExpirationTime;
+        this.signingKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
+    }
 
     public String generateToken(String email, List<String> roles) {
         List<String> formattedRoles = roles.stream().map(role -> "ROLE_" + role).toList();
@@ -43,7 +47,7 @@ public class JwtTokenProvider {
                 .claim("roles", formattedRoles)
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
-                .signWith(SignatureAlgorithm.HS512, secret)
+                .signWith(signingKey, SignatureAlgorithm.HS512)
                 .compact();
     }
 
@@ -63,7 +67,7 @@ public class JwtTokenProvider {
     public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder()
-                    .setSigningKey(secret)
+                    .setSigningKey(signingKey)
                     .build()
                     .parseClaimsJws(token);
             return true;
@@ -75,9 +79,10 @@ public class JwtTokenProvider {
 
     private Claims parseClaims(String token) {
         return Jwts.parserBuilder()
-                .setSigningKey(secret)
+                .setSigningKey(signingKey)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
     }
+
 }
