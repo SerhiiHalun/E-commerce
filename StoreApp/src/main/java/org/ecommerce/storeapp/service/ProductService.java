@@ -77,7 +77,6 @@ public class ProductService {
         return productRepository.findByCategoryId(categoryId);
     }
 
-
     @Transactional(readOnly = true)
     public List<Product> searchProductsByName(String name) {
         if (name == null || name.trim().isEmpty()) {
@@ -126,8 +125,6 @@ public class ProductService {
 
         return product;
     }
-
-
 
     @Transactional
     public void deleteProduct(int id) {

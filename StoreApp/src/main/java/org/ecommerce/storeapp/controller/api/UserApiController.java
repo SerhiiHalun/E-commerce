@@ -20,12 +20,9 @@ public class UserApiController {
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(
-            @RequestParam String firstName,
-            @RequestParam String lastName,
-            @RequestParam String email,
-            @RequestParam String password) {
-        User user = userService.registerUser(firstName, lastName, email, password);
-        return user != null
+            @RequestBody User user) {
+        User returnUser = userService.registerUser(user);
+        return returnUser != null
                 ? ResponseEntity.status(HttpStatus.CREATED).body(user)
                 : ResponseEntity.badRequest().body("Registration failed");
     }
