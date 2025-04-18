@@ -17,7 +17,7 @@ public class FeedbackMapper {
         dto.setId(feedback.getId());
         dto.setFeedback(feedback.getFeedback());
         dto.setRating(feedback.getRating());
-        dto.setUsername(feedback.getUser().getFirstName()); // або getEmail()
+        dto.setUsername(feedback.getUser().getFirstName());
         return dto;
     }
 

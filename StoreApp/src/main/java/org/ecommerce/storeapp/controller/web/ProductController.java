@@ -78,8 +78,8 @@ public class ProductController {
 
         model.addAttribute("product", product);
         model.addAttribute("specialProducts", productService.getProductsByDiscount(true, null)); // оставляем
-        model.addAttribute("feedbacks", feedbacks); // добавляем
-        model.addAttribute("review", new FeedbackCreateDto()); // чтобы форма добавления комментариев не ломалась
+        model.addAttribute("feedbacks", feedbacks);
+        model.addAttribute("review", new FeedbackCreateDto());
 
         return "product/view-product";
     }
