@@ -1,7 +1,15 @@
 package org.ecommerce.storeapp.service;
 
+import org.ecommerce.storeapp.dto.FeedbackCreateDto;
+import org.ecommerce.storeapp.dto.FeedbackResponseDto;
+import org.ecommerce.storeapp.exception.NotFoundException;
+import org.ecommerce.storeapp.mapper.FeedbackMapper;
 import org.ecommerce.storeapp.model.Feedback;
+import org.ecommerce.storeapp.model.Product;
+import org.ecommerce.storeapp.model.User;
 import org.ecommerce.storeapp.repository.FeedbackRepository;
+import org.ecommerce.storeapp.repository.ProductRepository;
+import org.ecommerce.storeapp.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,17 +19,28 @@ import java.util.NoSuchElementException;
 
 @Service
 public class FeedbackService {
+    private final ProductRepository productRepository;
     private final FeedbackRepository feedbackRepository;
+    private final UserRepository userRepository;
 
+    private final FeedbackMapper mapper;
     @Autowired
-    public FeedbackService(FeedbackRepository feedbackRepository) {
+    public FeedbackService(ProductRepository productRepository, FeedbackRepository feedbackRepository, UserRepository userRepository, FeedbackMapper mapper) {
+        this.productRepository = productRepository;
         this.feedbackRepository = feedbackRepository;
+        this.userRepository = userRepository;
+        this.mapper = mapper;
     }
 
     @Transactional
-    public Feedback createFeedback(Feedback feedback) {
-
-        return feedbackRepository.save(feedback);
+    public FeedbackResponseDto addFeedback(int productId, FeedbackCreateDto dto, String userEmail) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new NotFoundException("Product with id " + productId + " not found"));
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new NotFoundException("User with email " + userEmail + " not found"));
+        Feedback fb = mapper.toEntity(dto, product, user);
+        feedbackRepository.save(fb);
+        return mapper.toDto(fb);
     }
 
 
@@ -37,8 +56,10 @@ public class FeedbackService {
         return feedbackRepository.findAll();
     }
     @Transactional(readOnly = true)
-    public List<Feedback> getFeedbacksByProductId(int productId) {
-        return feedbackRepository.findAllByProductId(productId);
+    public List<FeedbackResponseDto> getFeedbacksByProductId(int productId) {
+        return feedbackRepository.findAllByProductId(productId)
+                .stream().map(FeedbackMapper::toDto).toList();
+
     }
 
     @Transactional(readOnly = true)

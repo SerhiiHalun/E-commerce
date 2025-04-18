@@ -40,7 +40,7 @@ public class ProductApiController {
 
     @GetMapping("/get-by-id/{id}")
     public ResponseEntity<Product> getById(@PathVariable int id) {
-        return ResponseEntity.ok(productService.GetProductById(id));
+        return ResponseEntity.ok(productService.getProductById(id));
     }
 
     @PostMapping(value = "/create",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

@@ -11,6 +11,8 @@
           crossorigin="anonymous">
 
     <link rel="stylesheet" href="/css/navbar.css">
+    <link rel="stylesheet" href="/css/product.css">
+
 </head>
 <body>
 
@@ -81,20 +83,20 @@
     </div>
 
     <div class="row row-cols-1 row-cols-md-3 row-cols-lg-6 g-4">
-        <div class="col" th:each="p : ${products}">
-            <a th:href="@{/product/{id}(id=${p.id})}" class="card h-100 text-decoration-none text-dark">
-                <<img th:if="${!#lists.isEmpty(p.images)}"
-                      th:src="${p.images[0].imgUrl}"
+        <div class="col" th:each="product : ${products}">
+            <a th:href="@{/product/{id}(id=${product.id})}" class="card h-100 text-decoration-none text-dark">
+                <<img th:if="${!#lists.isEmpty(product.images)}"
+                      th:src="${product.images[0].imgUrl}"
                       class="card-img-top"
                       style="height: 150px; object-fit: contain;"
                       alt="Product Image">
 
                 <div class="card-body">
-                    <h6 th:text="${p.name}">Product Name</h6>
+                    <h6 class="mb-1 product-name" th:text="${product.name}">Product Name</h6>
                     <div>
-                        <span th:text="${'$' + p.finalPrice}" class="text-success fw-bold">$0.00</span>
-                        <small th:if="${p.discount > 0}"
-                               th:text="${'$' + p.price}"
+                        <span th:text="${'$' + product.finalPrice}" class="text-success fw-bold">$0.00</span>
+                        <small th:if="${product.discount > 0}"
+                               th:text="${'$' + product.price}"
                                class="text-muted text-decoration-line-through ms-1">$0.00</small>
                     </div>
                     <div class="small text-warning">

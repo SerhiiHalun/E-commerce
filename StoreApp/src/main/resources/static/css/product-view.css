@@ -16,3 +16,9 @@
 .rating .star.selected ~ .star {
     color: #ffc107;
 }
+
+#productCarousel .carousel-control-prev-icon,
+#productCarousel .carousel-control-next-icon{
+    filter: invert(64%) sepia(87%) saturate(556%) hue-rotate(57deg);
+    filter: invert(64%) sepia(87%) saturate(556%) hue-rotate(57deg) !important;
+}
