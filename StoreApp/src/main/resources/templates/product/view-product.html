@@ -10,6 +10,7 @@
           crossorigin="anonymous">
     <link rel="stylesheet" href="/css/navbar.css">
     <link rel="stylesheet" href="/css/product-view.css">
+    <link rel="stylesheet" href="/css/product.css">
 
 </head>
 <body>
@@ -51,7 +52,7 @@
                 <button class="btn btn-sm btn-outline-success" type="submit">Search</button>
             </form>
 
-            <a href="/cart">
+            <a href="/product/cart">
                 <img src="/image/cart.svg" alt="Cart" width="24" height="24">
             </a>
             <a href="/auth/account">
@@ -178,7 +179,8 @@
                          style="height: 180px; object-fit: contain;" alt="Product Image">
 
                     <div class="card-body px-2">
-                        <h6 th:text="${product.name}" class="mb-1"></h6>
+                        <h6 th:text="${product.name}" class="product-name mb-1"></h6>
+
                         <div>
                             <span th:text="${'$' + product.finalPrice}" class="text-success fw-bold">$0.00</span>
                             <small class="text-muted text-decoration-line-through ms-2"
