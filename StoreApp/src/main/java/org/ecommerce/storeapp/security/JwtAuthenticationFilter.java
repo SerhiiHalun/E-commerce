@@ -30,6 +30,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         this.tokenProvider = tokenProvider;
         this.userDetailsService = userDetailsService;
     }
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        return !request.getRequestURI().startsWith("/api/");
+    }
 
 
     @Override
@@ -48,6 +52,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authentication);
         } else if (token == null) {
+        } else if (token == null ) {
             logger.warn("Authorization header is missing or does not contain Bearer token");
         }
         filterChain.doFilter(request, response);

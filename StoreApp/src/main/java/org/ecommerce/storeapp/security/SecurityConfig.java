@@ -19,13 +19,13 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-//    private final JwtAuthenticationFilter jwtFilter;
+    private final JwtAuthenticationFilter jwtFilter;
     private final UserDetailsService userDetailsService;
 
     public SecurityConfig(
-//            JwtAuthenticationFilter jwtFilter,
+            JwtAuthenticationFilter jwtFilter,
                           UserDetailsService userDetailsService) {
-//        this.jwtFilter = jwtFilter;
+        this.jwtFilter = jwtFilter;
         this.userDetailsService = userDetailsService;
     }
 
@@ -89,8 +89,8 @@ public class SecurityConfig {
                         .anyRequest().permitAll()
                 )
 
-//                // JWT-filter for API
-//                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+//               JWT-filter for API
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
 
                 .csrf(Customizer.withDefaults());
 

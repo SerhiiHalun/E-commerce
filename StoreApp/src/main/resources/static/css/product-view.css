@@ -1,6 +1,6 @@
 .rating {
     display: flex;
-    flex-direction: row-reverse; /* Это меняет порядок звезд */
+    flex-direction: row-reverse;
     justify-content: flex-end;
 }
 

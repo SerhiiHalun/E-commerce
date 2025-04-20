@@ -17,11 +17,6 @@ import java.security.Principal;
 public class FeedbackController {
     private final FeedbackService feedbackService;
 
-//    @GetMapping()
-//    public List<FeedbackResponseDto> getAll(@PathVariable int productId) {
-//        return feedbackService.getFeedbacksByProductId(productId);
-//
-//    }
     @PostMapping("/review")
     public String addReview(@ModelAttribute("review") @Valid FeedbackCreateDto dto,
                             @PathVariable int productId,

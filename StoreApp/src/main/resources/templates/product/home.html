@@ -112,14 +112,14 @@
 
         <div id="offer-container" class="d-flex overflow-hidden gap-4">
             <div th:each="product : ${specialProducts}" class="card border-0 bg-light" style="min-width: 220px;">
-            <a th:href="@{/product/{id}(id=${product.id})}" class="text-decoration-none text-dark">
+                <a th:href="@{/product/{id}(id=${product.id})}" class="text-decoration-none text-dark">
                     <img th:if="${!#lists.isEmpty(product.images)}"
                          th:src="${product.images[0].imgUrl}"
                          class="card-img-top"
                          style="height: 180px; object-fit: contain;" alt="Product Image">
 
                     <div class="card-body px-2">
-                        <h6 class="mb-1 product-name" th:text="${product.name}"></h6>
+                        <h6 th:text="${product.name}" class="mb-1"></h6>
                         <div>
                             <span th:text="${'$' + product.finalPrice}" class="text-success fw-bold">$0.00</span>
                             <small class="text-muted text-decoration-line-through ms-2"
