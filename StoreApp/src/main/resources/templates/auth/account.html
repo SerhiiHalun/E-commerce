@@ -60,7 +60,6 @@
 
 <main class="flex-grow-1 py-5 account-wrapper container">
 
-    <!-- маленький привет в правом верхнем углу -->
     <p class="text-end fw-semibold mb-4">
         Welcome! <span th:text="${user.firstName} + ' ' + ${user.lastName}"></span>
     </p>
@@ -81,7 +80,7 @@
                 <li class="nav-item"><a class="nav-link" href="#">Order pending</a></li>
             </ul>
         </aside>
- 
+
         <section class="col-lg-9">
             <div class="card shadow-sm">
                 <div class="card-body p-4">
@@ -111,7 +110,7 @@
                         Change password
                     </button>
 
-                    <!-- buttons -->
+
                     <div class="d-flex justify-content-end mt-4">
                         <button class="btn btn-danger px-4"
                                 data-bs-toggle="modal"

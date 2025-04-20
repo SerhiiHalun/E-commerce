@@ -84,6 +84,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/category/create", "/api/category/delete/**", "/api/category/update").hasRole("ADMIN")
                         .requestMatchers("/api/product/create", "/api/product/delete/**", "/api/product/update/").hasAnyRole("SELLER", "ADMIN")
                         .requestMatchers("/api/product/get-all", "/api/product/get-by-id/", "/api/product/get-by-category-id/").permitAll()
+                        .requestMatchers("/api/products/*/feedback").authenticated()
+                        .requestMatchers("/api/feedback/**").authenticated()
                         .anyRequest().permitAll()
                 )
 

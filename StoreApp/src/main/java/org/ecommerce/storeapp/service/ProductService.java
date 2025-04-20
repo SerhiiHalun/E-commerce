@@ -53,7 +53,7 @@ public class ProductService {
 
     @Transactional(readOnly = true)
     @Cacheable("product")
-    public Product GetProductById(int id){
+    public Product getProductById(int id){
         return productRepository.findById(id).orElseThrow(() -> new NoSuchElementException("Product with id " + id + " not found"));
     };
     @Transactional(readOnly = true)

@@ -1,8 +1,11 @@
 package org.ecommerce.storeapp.controller.web;
 
+import org.ecommerce.storeapp.dto.FeedbackCreateDto;
+import org.ecommerce.storeapp.dto.FeedbackResponseDto;
 import org.ecommerce.storeapp.model.Category;
 import org.ecommerce.storeapp.model.Product;
 import org.ecommerce.storeapp.service.CategoryService;
+import org.ecommerce.storeapp.service.FeedbackService;
 import org.ecommerce.storeapp.service.ProductService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,11 +20,12 @@ public class ProductController {
 
     private final ProductService productService;
     private final CategoryService categoryService;
-
+    private final FeedbackService feedbackService;
     public ProductController(ProductService productService,
-                             CategoryService categoriesService) {
+                             CategoryService categoriesService, FeedbackService feedbackService) {
         this.productService = productService;
         this.categoryService = categoriesService;
+        this.feedbackService = feedbackService;
     }
 
     @GetMapping("/home")
@@ -31,6 +35,7 @@ public class ProductController {
         model.addAttribute("allCategories", categoryService.findAll());
         return "product/home";
     }
+
 
 
     @GetMapping
@@ -68,9 +73,14 @@ public class ProductController {
 
     @GetMapping("/{id}")
     public String getProduct(@PathVariable int id, Model model) {
-        Product product = productService.GetProductById(id);
+        Product product = productService.getProductById(id);
+        List<FeedbackResponseDto> feedbacks = feedbackService.getFeedbacksByProductId(id);
+
         model.addAttribute("product", product);
-        model.addAttribute("specialProducts", productService.getProductsByDiscount(true, null));
+        model.addAttribute("specialProducts", productService.getProductsByDiscount(true, null)); // оставляем
+        model.addAttribute("feedbacks", feedbacks);
+        model.addAttribute("review", new FeedbackCreateDto());
+
         return "product/view-product";
     }
 
@@ -99,7 +109,7 @@ public class ProductController {
 
     @GetMapping("/{id}/edit")
     public String showEditForm(@PathVariable int id, Model model) {
-        Product product = productService.GetProductById(id);
+        Product product = productService.getProductById(id);
         model.addAttribute("product", product);
 
         List<Category> categories = categoryService.findAll();
